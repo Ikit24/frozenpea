@@ -12,6 +12,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/theme"
+	"fyne.io/fyne/v2/layout"
 
 	"github.com/BurntSushi/xgb"
 	"github.com/BurntSushi/xgb/xproto"
@@ -79,9 +80,15 @@ func showNotification(a fyne.App) fyne.Window {
 		topText.TextSize = 24
 		topText.TextStyle = fyne.TextStyle{Bold: true}
 
+		cancelSess := widget.NewButton("Cancel session", func() {
+			a.Quit()
+		})
+		cancelSess.Resize(fyne.NewSize(150, 60))
+
 		textContainer := container.NewVBox(
+			layout.NewSpacer(),
 			topText,
-			widget.NewLabel(""),
+			cancelSess,
 		)
 		
 		content := container.NewStack(img, container.NewCenter(textContainer))

@@ -18,6 +18,7 @@ import (
 type Config struct {
 	WorkDuration  string
 	BreakDuration string
+	EndApp        int
 }
 
 var appConfig Config
@@ -75,6 +76,7 @@ func main () {
 		workDur := time.Duration(workMins) * time.Minute
 		breakMins, _ := strconv.Atoi(appConfig.BreakDuration)
 		breakDur := time.Duration(breakMins) * time.Minute
+		//cancelApp := strconv.Itoa(appConfig.EndApp)
 
 		isBreak := false
 		var w fyne.Window
