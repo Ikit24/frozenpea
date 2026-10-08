@@ -106,7 +106,7 @@ func showNotification(a fyne.App) fyne.Window {
 
 func createSoundCheckBox(label string, configField *bool) *fyne.Container {
 	check := widget.NewCheck("", func(checked bool) {
-	*configField = checked
+		*configField = checked
 	})
 	text := canvas.NewText(label, color.NRGBA{R: 255, G: 255, B: 255, A: 255})
 	text.TextStyle = fyne.TextStyle{Bold: true}
