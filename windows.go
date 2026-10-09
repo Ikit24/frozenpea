@@ -12,7 +12,6 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/layout"
 
 	"github.com/BurntSushi/xgb"
 	"github.com/BurntSushi/xgb/xproto"
@@ -25,6 +24,16 @@ type SoundConfig struct {
 }
 
 var soundConfig SoundConfig
+
+func createSoundCheckBox(label string, configField *bool) *fyne.Container {
+	check := widget.NewCheck("", func(checked bool) {
+		*configField = checked
+	})
+	text := canvas.NewText(label, color.NRGBA{R: 255, G: 255, B: 255, A: 255})
+	text.TextStyle = fyne.TextStyle{Bold: true}
+	textBox := container.NewHBox(check, text)
+	return textBox
+}
 
 func showBreakWindow(a fyne.App) fyne.Window {
 	var w fyne.Window
@@ -67,7 +76,7 @@ func showBreakWindow(a fyne.App) fyne.Window {
 	return w
 }
 
-func showNotification(a fyne.App) fyne.Window {
+func showNotification(a fyne.App, delayCh chan string) fyne.Window {
 	var n fyne.Window
 
 	fyne.DoAndWait(func() {
@@ -80,14 +89,32 @@ func showNotification(a fyne.App) fyne.Window {
 		topText.TextSize = 24
 		topText.TextStyle = fyne.TextStyle{Bold: true}
 
+		delayEntry := widget.NewEntry()
+		delayEntry.Resize(fyne.NewSize(150, 60))
+		delayDur := widget.NewFormItem("Delay duration (minutes):", delayEntry)
+	
+		form := widget.NewForm(delayDur)
+
+		skipBreakButton := widget.NewButton("Confirm break delay", func() {
+			_, err := strconv.Atoi(delayEntry.Text)
+			if err != nil {
+				dialog.ShowError(errors.New("Please enter a valid number"), n)
+				return
+			}
+
+			n.Close()
+			go func() { delayCh <- delayEntry.Text }()
+		})
+
 		cancelSess := widget.NewButton("Cancel session", func() {
 			a.Quit()
 		})
 		cancelSess.Resize(fyne.NewSize(150, 60))
 
 		textContainer := container.NewVBox(
-			layout.NewSpacer(),
 			topText,
+			form,
+	 		skipBreakButton,
 			cancelSess,
 		)
 		
@@ -102,16 +129,6 @@ func showNotification(a fyne.App) fyne.Window {
 	})
 
 	return n
-}
-
-func createSoundCheckBox(label string, configField *bool) *fyne.Container {
-	check := widget.NewCheck("", func(checked bool) {
-		*configField = checked
-	})
-	text := canvas.NewText(label, color.NRGBA{R: 255, G: 255, B: 255, A: 255})
-	text.TextStyle = fyne.TextStyle{Bold: true}
-	textBox := container.NewHBox(check, text)
-	return textBox
 }
 
 func startupWindow(a fyne.App, setupDone chan bool) {

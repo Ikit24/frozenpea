@@ -18,7 +18,6 @@ import (
 type Config struct {
 	WorkDuration  string
 	BreakDuration string
-	EndApp        int
 }
 
 var appConfig Config
@@ -67,7 +66,8 @@ func main () {
 
 	go func () {
 		time.Sleep(100 * time.Millisecond)
-		setupDone := make(chan bool)
+		setupDone := make(chan bool, 1)
+
 		startupWindow(a, setupDone)
 		playSound("./assets/intro.mp3")
 		<-setupDone
@@ -97,10 +97,11 @@ func main () {
 				isBreak = false
 			} else {
 				var n fyne.Window
+				delayCh := make(chan string, 1)
 				select {
 				case <- time.After(workDur - 1 * time.Minute):
 					//Break in 1 min
-					n = showNotification(a)
+					n = showNotification(a, delayCh)
 					if soundConfig.BreakReminder {
 						playSound("./assets/before_break.mp3")
 					}
@@ -111,12 +112,19 @@ func main () {
 				case <- time.After(1 * time.Minute):
 					//Break start
 					fyne.Do(func() { n.Close() })
-					w = showBreakWindow(a)
-					if soundConfig.BreakStartingSound {
-						playSound("./assets/break_start.mp3")
+				case delay := <- delayCh:
+					delayMins, _ := strconv.Atoi(delay)
+					select {
+					case <-time.After(time.Duration(delayMins) * time.Minute):
+					case <-done:
+						break mainLoop
 					}
 				case <- done:
 					break mainLoop
+				}
+				w = showBreakWindow(a)
+				if soundConfig.BreakStartingSound {
+					playSound("./assets/break_start.mp3")
 				}
 				isBreak = true
 			}
