@@ -30,8 +30,8 @@ A productivity app which locks the user out from the machine after a set of minu
 
 1. **Clone the repository**:
 ```bash
-   git clone https://github.com/Ikit24/Frozenpea.git
-   cd Frozenpea
+   git clone https://github.com/Ikit24/frozenpea.git
+   cd frozenpea
 ```
 
 2. **Install dependencies**:
@@ -53,11 +53,11 @@ After break starts you cannot interact with the OS.
 
 ## Automatic Startup Configuration (Linux)
 
-Follow these steps to make FrozenPea run automatically on system startup.
+Follow these steps to make frozenPea run automatically on system startup.
 
 ### 1. Compile the Program
 ```bash
-cd ~/projects/code/FrozenPea
+cd ~/projects/code/frozenPea
 go build -o frozenpea
 chmod +x main
 ```
@@ -70,7 +70,7 @@ nvim ~/startup.sh
 Add the following content (replace `ati` with your username):
 ```bash
 #!/bin/bash
-/home/ati/projects/code/FrozenPea/frozenpea >> /home/ati/projects/code/FrozenPea/startup.log 2>&1
+/home/ati/projects/code/frozenPea/frozenpea >> /home/ati/projects/code/frozenPea/startup.log 2>&1
 ```
 
 Save and exit (Ctrl+X, Y, Enter)
@@ -110,7 +110,7 @@ Test the script without rebooting:
 
 Check the log file for any errors:
 ```bash
-cat ~/projects/code/FrozenPea/startup.log
+cat ~/projects/code/frozenPea/startup.log
 ```
 
 ### Managing the Autostart
