@@ -1,131 +1,127 @@
 # Frozenpea
 
-A productivity app which locks the user out from the machine after a set of minutes to prevent RSI related problems and support healthier work-life.
+A productivity app which locks the user out from the machine after a set amount of minutes to prevent RSI-related problems and support a healthier work-life.
 
 ## Features
 
-- Notification sound upon startup and before break starts
+- Notification sound upon startup and before the break starts
 - Automatic screen lock after the set amount of minutes
 - Background window display during rest periods
 - Customizable notifications on startup
-   **Note:** Samples have a slight delay after playing. Ensure you're not clickick eveywhere, the system still registers and carries out those comands too.
-
+  - **Note:** Samples have a slight delay after playing. Avoid clicking everywhere, because the system still registers and carries out those commands too.
+- Delay the break once from the "Break in 1 minute" warning window
 - Helps prevent repetitive strain injuries (RSI)
 - Promotes healthier work habits
 
 ## System Requirements
-- Linux with X11 display server, also works on Wayland
+
+- Linux with an X11 display server (tested on Pop!_OS with GNOME, via XWayland)
 - Go 1.21 or higher
-
-## Prerequisites
-
-- Go 1.21+ installed: https://go.dev/dl/
-- Required dependencies:
-```bash
-  go get fyne.io/fyne/v2
-  go get github.com/BurntSushi/xgb
-```
 
 ## Installation
 
 1. **Clone the repository**:
-```bash
+   ```bash
    git clone https://github.com/Ikit24/frozenpea.git
    cd frozenpea
-```
+   ```
 
 2. **Install dependencies**:
-```bash
+   ```bash
    go mod download
-```
+   ```
 
 3. **Run the application**:
-```bash
+   ```bash
    go run .
-```
+   ```
+
+Go 1.21+ can be downloaded from https://go.dev/dl/
 
 ## Usage
 
-On startup you will have the option to set break and workduration.
-The "Cancel session" button will stop the program completely.
-Once the settings are confirmed the application starts, you will be notified when the break is about to happen.
-After break starts you cannot interact with the OS.
+On startup you can set the work and break duration.
+The "Cancel session" button stops the program completely.
+Once the settings are confirmed, the application starts and you will be notified one minute before the break.
+When the break warning appears, you can enter a number of minutes and press "Confirm break delay" to postpone the break once.
+After the break starts you cannot interact with the OS.
 
 ## Automatic Startup Configuration (Linux)
 
-Follow these steps to make frozenPea run automatically on system startup.
+### 1. Compile the program
 
-### 1. Compile the Program
 ```bash
-cd ~/projects/code/frozenPea
+cd ~/projects/code/frozenpea
 go build -o frozenpea
-chmod +x main
 ```
 
-### 2. Create Startup Script
+### 2. Create the startup script
+
+Create `~/startup.sh` (replace `ati` with your username):
+
 ```bash
-nvim ~/startup.sh
+#!/bin/sh
+sleep 10
+cd /home/ati/projects/code/frozenpea || exit 1
+exec ./frozenpea >> /home/ati/frozenpea.log 2>&1
 ```
 
-Add the following content (replace `ati` with your username):
-```bash
-#!/bin/bash
-/home/ati/projects/code/frozenPea/frozenpea >> /home/ati/projects/code/frozenPea/startup.log 2>&1
-```
+Make it executable:
 
-Save and exit (Ctrl+X, Y, Enter)
-
-### 3. Make Script Executable
 ```bash
 chmod +x ~/startup.sh
 ```
 
-### 4. Add to Crontab
+The `cd` is required because the app loads its images and sounds from `./assets`.
+
+### 3. Create the autostart entry
+
 ```bash
-crontab -e
+mkdir -p ~/.config/autostart
+nano ~/.config/autostart/frozenpea.desktop
 ```
 
-Add this line at the end:
+```ini
+[Desktop Entry]
+Type=Application
+Name=FrozenPea Break Timer
+Exec=/home/ati/startup.sh
+X-GNOME-Autostart-enabled=true
 ```
-@reboot /home/ati/startup.sh
-```
-
-Save and exit.
-
-### 5. Verify Setup
-
-Check that crontab was saved:
-```bash
-crontab -l
-```
-
-You should see: `@reboot /home/ati/startup.sh`
 
 ### Testing
 
 Test the script without rebooting:
+
 ```bash
 ~/startup.sh
 ```
 
 Check the log file for any errors:
+
 ```bash
-cat ~/projects/code/frozenPea/startup.log
+cat ~/frozenpea.log
 ```
 
-### Managing the Autostart
+### Managing the autostart
 
 **Stop the program:**
+
 ```bash
 pkill frozenpea
 ```
 
 **Remove from startup:**
+
 ```bash
-crontab -e
-# Delete the @reboot line, then save
+rm ~/.config/autostart/frozenpea.desktop
 ```
-### MIT License
+
+> After every code change, run `go build -o frozenpea` again.
+
+## License
+
+MIT License
 
 Copyright (c) 2026 Attila Szasz
 
