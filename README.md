@@ -74,6 +74,8 @@ chmod +x ~/startup.sh
 
 The `cd` is required because the app loads its images and sounds from `./assets`.
 
+The `sleep 10` gives the desktop session time to finish loading before the app opens its windows. The startup window appears about 10 seconds after you log in.
+
 ### 3. Create the autostart entry
 
 ```bash
