@@ -29,7 +29,7 @@ func initAudio() {
 	streamer, format, _ := mp3.Decode(f)
 	streamer.Close()
 
-	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/5))
 }
 
 func playSound(filename string) {
