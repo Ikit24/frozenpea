@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
+	"time"
 
 	"github.com/gopxl/beep"
 	"github.com/gopxl/beep/mp3"
@@ -54,7 +54,7 @@ func playSound(filename string) {
 	<-done
 }
 
-func main () {
+func main() {
 	initAudio()
 	a := app.New()
 
@@ -62,9 +62,9 @@ func main () {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	done := make(chan bool, 1)
 
-	go func() { <-sigs; done <- true} ()
+	go func() { <-sigs; done <- true }()
 
-	go func () {
+	go func() {
 		time.Sleep(100 * time.Millisecond)
 		setupDone := make(chan bool, 1)
 
@@ -80,46 +80,47 @@ func main () {
 
 		isBreak := false
 		var w fyne.Window
-		mainLoop: for {
+	mainLoop:
+		for {
 			if isBreak {
 				select {
-				case <- time.After(breakDur):
+				case <-time.After(breakDur):
 					//Break end
 					fyne.Do(func() {
-					w.Close()
+						w.Close()
 					})
 					if soundConfig.BreakOverSound {
 						playSound("./assets/break_end.mp3")
 					}
-				case <- done:
-				break mainLoop
+				case <-done:
+					break mainLoop
 				}
 				isBreak = false
 			} else {
 				var n fyne.Window
 				delayCh := make(chan string, 1)
 				select {
-				case <- time.After(workDur - 1 * time.Minute):
+				case <-time.After(workDur - 1*time.Minute):
 					//Break in 1 min
 					n = showNotification(a, delayCh)
 					if soundConfig.BreakReminder {
 						playSound("./assets/before_break.mp3")
 					}
-				case <- done:
+				case <-done:
 					break mainLoop
 				}
 				select {
-				case <- time.After(1 * time.Minute):
+				case <-time.After(1 * time.Minute):
 					//Break start
 					fyne.Do(func() { n.Close() })
-				case delay := <- delayCh:
+				case delay := <-delayCh:
 					delayMins, _ := strconv.Atoi(delay)
 					select {
 					case <-time.After(time.Duration(delayMins) * time.Minute):
 					case <-done:
 						break mainLoop
 					}
-				case <- done:
+				case <-done:
 					break mainLoop
 				}
 				w = showBreakWindow(a)
@@ -129,7 +130,7 @@ func main () {
 				isBreak = true
 			}
 		}
-	} ()
+	}()
 	dummy := a.NewWindow("")
 	dummy.Resize(fyne.NewSize(1, 1))
 	dummy.Hide()

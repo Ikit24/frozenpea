@@ -1,26 +1,26 @@
 package main
 
 import (
-	"fmt"
 	"errors"
-	"strconv"
-	"image/color"
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/widget"
-	"fyne.io/fyne/v2/driver"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/driver"
 	"fyne.io/fyne/v2/theme"
+	"fyne.io/fyne/v2/widget"
+	"image/color"
+	"strconv"
 
 	"github.com/BurntSushi/xgb"
 	"github.com/BurntSushi/xgb/xproto"
 )
 
 type SoundConfig struct {
-	BreakReminder        bool
-	BreakStartingSound   bool
-	BreakOverSound       bool
+	BreakReminder      bool
+	BreakStartingSound bool
+	BreakOverSound     bool
 }
 
 var soundConfig SoundConfig
@@ -92,7 +92,7 @@ func showNotification(a fyne.App, delayCh chan string) fyne.Window {
 		delayEntry := widget.NewEntry()
 		delayEntry.Resize(fyne.NewSize(150, 60))
 		delayDur := widget.NewFormItem("Delay duration (minutes):", delayEntry)
-	
+
 		form := widget.NewForm(delayDur)
 
 		skipBreakButton := widget.NewButton("Confirm break delay", func() {
@@ -114,10 +114,10 @@ func showNotification(a fyne.App, delayCh chan string) fyne.Window {
 		textContainer := container.NewVBox(
 			topText,
 			form,
-	 		skipBreakButton,
+			skipBreakButton,
 			cancelSess,
 		)
-		
+
 		content := container.NewStack(img, container.NewCenter(textContainer))
 
 		n.SetContent(content)
@@ -133,12 +133,12 @@ func showNotification(a fyne.App, delayCh chan string) fyne.Window {
 
 func startupWindow(a fyne.App, setupDone chan bool) {
 	var start fyne.Window
-	
-	fyne.DoAndWait(func () {
+
+	fyne.DoAndWait(func() {
 		start = a.NewWindow("Welcome to FrozenPea")
 		workEntry := widget.NewEntry()
 		workEntry.Resize(fyne.NewSize(150, 60))
-		
+
 		breakEntry := widget.NewEntry()
 		breakEntry.Resize(fyne.NewSize(150, 60))
 		workDur := widget.NewFormItem("Session duration (minutes):", workEntry)
@@ -147,15 +147,15 @@ func startupWindow(a fyne.App, setupDone chan bool) {
 		form := widget.NewForm(workDur, breakDur)
 
 		notifyBreakReminder := createSoundCheckBox("Break reminder  ", &soundConfig.BreakReminder)
-		playBreakReminderSample := widget.NewButtonWithIcon("", theme.MediaPlayIcon(), func() {playSound("./assets/before_break.mp3")})
+		playBreakReminderSample := widget.NewButtonWithIcon("", theme.MediaPlayIcon(), func() { playSound("./assets/before_break.mp3") })
 		beforeBreakReminder := container.NewHBox(notifyBreakReminder, playBreakReminderSample)
 
 		notifyBreakStarting := createSoundCheckBox("Break starting    ", &soundConfig.BreakStartingSound)
-		playBreakStartingSample := widget.NewButtonWithIcon("", theme.MediaPlayIcon(), func() {playSound("./assets/break_start.mp3")})
+		playBreakStartingSample := widget.NewButtonWithIcon("", theme.MediaPlayIcon(), func() { playSound("./assets/break_start.mp3") })
 		breakStartingButton := container.NewHBox(notifyBreakStarting, playBreakStartingSample)
 
 		notifyBreakOver := createSoundCheckBox("Break ending      ", &soundConfig.BreakOverSound)
-		playBreakOverSample := widget.NewButtonWithIcon("", theme.MediaPlayIcon(), func() {playSound("./assets/break_end.mp3")})
+		playBreakOverSample := widget.NewButtonWithIcon("", theme.MediaPlayIcon(), func() { playSound("./assets/break_end.mp3") })
 		breakOverButton := container.NewHBox(notifyBreakOver, playBreakOverSample)
 
 		confirmButton := widget.NewButton("Confirm changes", func() {
@@ -181,19 +181,19 @@ func startupWindow(a fyne.App, setupDone chan bool) {
 		})
 		cancelSess.Resize(fyne.NewSize(150, 60))
 
-			img := canvas.NewImageFromFile("./assets/fpea.jpg")
-			img.FillMode = canvas.ImageFillStretch
+		img := canvas.NewImageFromFile("./assets/fpea.jpg")
+		img.FillMode = canvas.ImageFillStretch
 
-			formContent := container.NewVBox(
-			form,beforeBreakReminder,
+		formContent := container.NewVBox(
+			form, beforeBreakReminder,
 			breakStartingButton, breakOverButton,
 			confirmButton, cancelSess,
-			)
-			content := container.NewStack(img, container.NewCenter(formContent))
+		)
+		content := container.NewStack(img, container.NewCenter(formContent))
 
-			start.SetContent(content)
-			start.Resize(fyne.NewSize(1000, 650))
-			start.SetFixedSize(true)
-			start.Show()
+		start.SetContent(content)
+		start.Resize(fyne.NewSize(1000, 650))
+		start.SetFixedSize(true)
+		start.Show()
 	})
 }
