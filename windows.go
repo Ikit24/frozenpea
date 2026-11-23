@@ -172,7 +172,7 @@ func startupWindow(a fyne.App, setupDone chan bool) {
 			}
 			appConfig.WorkDuration = workEntry.Text
 			appConfig.BreakDuration = breakEntry.Text
-			go func () { setupDone <- true })
+			go func () { setupDone <- true }()
 			start.Close()
 		})
 
